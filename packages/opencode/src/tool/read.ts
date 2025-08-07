@@ -1,12 +1,17 @@
 import { z } from "zod"
-import * as fs from "fs"
-import * as path from "path"
 import { Tool } from "./tool"
-import { LSP } from "../lsp"
-import { FileTime } from "../file/time"
 import DESCRIPTION from "./read.txt"
-import { App } from "../app/app"
-import { Filesystem } from "../util/filesystem"
+import { app_opencode_apis_adapter } from "../app_opencode_adapter"
+
+namespace Bun {
+  export type BunFile = app_opencode_apis_adapter.Bun.BunFile
+}
+
+const path = app_opencode_apis_adapter.path
+const Filesystem = app_opencode_apis_adapter.Filesystem
+const App = app_opencode_apis_adapter.App
+const LSP = app_opencode_apis_adapter.LSP
+const process = app_opencode_apis_adapter.process
 
 const DEFAULT_READ_LIMIT = 2000
 const MAX_LINE_LENGTH = 2000
@@ -19,6 +24,11 @@ export const ReadTool = Tool.define("read", {
     limit: z.coerce.number().describe("The number of lines to read (defaults to 2000)").optional(),
   }),
   async execute(params, ctx) {
+    console.log("execute ReadTool")
+    const fs = ctx.appOpenCodeDbAdapters.fs
+    const FileTime = ctx.appOpenCodeDbAdapters.FileTime
+    const Bun = ctx.appOpenCodeDbAdapters.Bun
+
     let filepath = params.filePath
     if (!path.isAbsolute(filepath)) {
       filepath = path.join(process.cwd(), filepath)
@@ -28,12 +38,12 @@ export const ReadTool = Tool.define("read", {
       throw new Error(`File ${filepath} is not in the current working directory`)
     }
 
-    const file = Bun.file(filepath)
+    const file = await Bun.file(filepath)
     if (!(await file.exists())) {
       const dir = path.dirname(filepath)
       const base = path.basename(filepath)
 
-      const dirEntries = fs.readdirSync(dir)
+      const dirEntries = await fs.readdirSync(dir)
       const suggestions = dirEntries
         .filter(
           (entry) =>
@@ -74,7 +84,7 @@ export const ReadTool = Tool.define("read", {
 
     // just warms the lsp client
     LSP.touchFile(filepath, false)
-    FileTime.read(ctx.sessionID, filepath)
+    await FileTime.read(ctx.sessionID, filepath)
 
     return {
       title: path.relative(App.info().path.root, filepath),

@@ -1,4 +1,5 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec"
+import type { app_opencode_apis_adapter } from "../app_opencode_adapter"
 
 export namespace Tool {
   interface Metadata {
@@ -10,6 +11,17 @@ export namespace Tool {
     callID?: string
     abort: AbortSignal
     metadata(input: { title?: string; metadata?: M }): void
+    appOpenCodeDbAdapters: {
+      fs: {
+        readdirSync: (path: string) => Promise<string[]>
+      }
+      FileTime: {
+        read: (sessionID: string, filepath: string) => Promise<void>
+      }
+      Bun: {
+        file: (filepath: string) => Promise<app_opencode_apis_adapter.Bun.BunFile>
+      }
+    }
   }
   export interface Info<Parameters extends StandardSchemaV1 = StandardSchemaV1, M extends Metadata = Metadata> {
     id: string
