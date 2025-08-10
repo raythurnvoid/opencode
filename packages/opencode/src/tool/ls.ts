@@ -1,8 +1,10 @@
 import { z } from "zod"
 import { Tool } from "./tool"
-import { App } from "../app/app"
-import * as path from "path"
 import DESCRIPTION from "./ls.txt"
+import { app_opencode_apis_adapter } from "../app_opencode_adapter"
+
+const path = app_opencode_apis_adapter.path
+const App = app_opencode_apis_adapter.App
 
 export const IGNORE_PATTERNS = [
   "node_modules/",

@@ -21,6 +21,10 @@ export namespace Tool {
       Bun: {
         file: (filepath: string) => Promise<app_opencode_apis_adapter.Bun.BunFile>
       }
+      Glob: {
+        scan: (pattern: string, options: { cwd: string; dot?: boolean }) => Promise<string[]>
+        match: (pattern: string, path: string) => boolean
+      }
     }
   }
   export interface Info<Parameters extends StandardSchemaV1 = StandardSchemaV1, M extends Metadata = Metadata> {

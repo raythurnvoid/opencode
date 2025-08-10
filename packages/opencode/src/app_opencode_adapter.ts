@@ -81,6 +81,20 @@ export namespace app_opencode_apis_adapter {
       // Return extension including the dot
       return normalizedPath.substring(lastDotIndex)
     }
+
+    export function resolve(from: string, to: string): string {
+      const normalizedFrom = from.replaceAll("\\", "/").replaceAll("//", "/")
+      const normalizedTo = to.replaceAll("\\", "/").replaceAll("//", "/")
+
+      // If to is already absolute, return it
+      if (normalizedTo.startsWith("/")) {
+        return normalizedTo
+      }
+
+      // Join from and to, ensuring proper path format
+      const joined = `${normalizedFrom}/${normalizedTo}`.replaceAll("//", "/")
+      return joined.startsWith("/") ? joined : `/${joined}`
+    }
   }
 
   export namespace Filesystem {
